@@ -1,0 +1,40 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="bower_components/material-design-lite/material.min.css">
+        <link rel="stylesheet" href="bower_components/roboto-fontface/css/roboto-fontface.css">
+
+        <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+
+        <link rel="stylesheet" href="styles/main.css">
+        <link rel="stylesheet" href="styles/login.css">
+    </head>
+    <body>
+        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+            <header class="mdl-layout__header">
+                <div class="mdl-layout__header-row">
+                    <span class="mdl-layout-title">Gestion de compte BuckUTT</span>
+                </div>
+            </header>
+            <main>
+                <div class="mdl-card mdl-shadow--4dp">
+                    <div class="mdl-card__title">
+                        <h2 class="mdl-card__title-text">Connexion</h2>
+                    </div>
+                    <div class="mdl-card__supporting-text">
+                        <form action="#">
+                            <div class="mdl-textfield mdl-js-textfield">
+                                <input class="mdl-textfield__input" type="password" maxlength="4" id="pin" />
+                                <label class="mdl-textfield__label" for="pin">Code PIN</label>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="mdl-card__actions mdl-card--border">
+                        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Connexion</a>
+                    </div>
+                </div>
+            </main>
+        </div>
+        <script src="bower_components/material-design-lite/material.min.js"></script>
+        <script src="scripts/hidePIN.js"></script>
+    </body>
+</html>

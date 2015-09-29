@@ -1,0 +1,163 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="bower_components/material-design-lite/material.min.css">
+        <link rel="stylesheet" href="bower_components/roboto-fontface/css/roboto-fontface.css">
+
+        <link rel="stylesheet" href="//fonts.googleapis.com/icon?family=Material+Icons">
+
+        <link rel="stylesheet" href="styles/main.css">
+        <link rel="stylesheet" href="styles/dashboard.css">
+    </head>
+    <body>
+        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer">
+            <div class="mdl-layout__drawer">
+                <span class="mdl-layout-title">BuckUTT</span>
+                <nav class="mdl-navigation">
+                    <a class="mdl-navigation__link navigation-active" data-target="page-0">
+                        <i class="material-icons">history</i>
+                        Historique
+                    </a>
+                    <a class="mdl-navigation__link" data-target="page-1">
+                        <i class="material-icons">attach_money</i>
+                        Rechargement
+                    </a>
+                    <a class="mdl-navigation__link" data-target="page-2">
+                        <i class="material-icons">lock_outline</i>
+                        PIN
+                    </a>
+                    <a class="mdl-navigation__link" data-target="page-3">
+                        <i class="material-icons">swap_horiz</i>
+                        Virements
+                    </a>
+                </nav>
+            </div>
+            <main class="mdl-layout__content">
+                <div class="page-content page-visible" id="page-0">
+                    <div class="mdl-card mdl-shadow--2dp">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Historique</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <table class="mdl-data-table mdl-js-data-table mdl-shadow--1dp">
+                                <colgroup>
+                                    <col width="14.54%">
+                                    <col width="11.818%">
+                                    <col width="21.818%">
+                                    <col width="21.818%">
+                                    <col width="21.818%">
+                                    <col width="8.181%">
+                                </colgroup>
+                                <thead>
+                                    <tr>
+                                        <th class="one mdl-data-table__cell--non-numeric">Date</th>
+                                        <th class="two mdl-data-table__cell--non-numeric">Type</th>
+                                        <th class="three mdl-data-table__cell--non-numeric">Location</th>
+                                        <th class="four mdl-data-table__cell--non-numeric">Objet</th>
+                                        <th class="five mdl-data-table__cell--non-numeric">Avec</th>
+                                        <th class="six">Valeur</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="mdl-data-table__cell--non-numeric">21/09/1994 - 18:11</td>
+                                        <td class="mdl-data-table__cell--non-numeric">Achat</td>
+                                        <td class="mdl-data-table__cell--non-numeric">Foyer</td>
+                                        <td class="mdl-data-table__cell--non-numeric">Formule 1€</td>
+                                        <td class="mdl-data-table__cell--non-numeric">Vendeur Jean Jacques</td>
+                                        <td>1€</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="mdl-data-table__cell--non-numeric">21/09/1994 - 18:11</td>
+                                        <td class="mdl-data-table__cell--non-numeric">Virement</td>
+                                        <td class="mdl-data-table__cell--non-numeric">Foyer</td>
+                                        <td class="mdl-data-table__cell--non-numeric">Formule 1€</td>
+                                        <td class="mdl-data-table__cell--non-numeric">Vendeur Jean Jacques</td>
+                                        <td>1€</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="mdl-data-table__cell--non-numeric">21/09/1994 - 18:11</td>
+                                        <td class="mdl-data-table__cell--non-numeric">Rechargement</td>
+                                        <td class="mdl-data-table__cell--non-numeric">Foyer</td>
+                                        <td class="mdl-data-table__cell--non-numeric">Formule 1€</td>
+                                        <td class="mdl-data-table__cell--non-numeric">Vendeur Jean Jacques</td>
+                                        <td>1€</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content" id="page-1">
+                    <div class="mdl-card mdl-shadow--2dp">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Rechargement</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <form>
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="number" pattern="[0-9]*(\.[0-9]+)?" id="amount" max="100" min="5" step="0.10">
+                                    <label class="mdl-textfield__label" for="amount">Prix</label>
+                                    <span class="mdl-textfield__error">Veuillez entrer un prix correct !</span>
+                                </div>
+                                <p>Vous serez redirigé vers un site bancaire sécurisé.</p>
+                                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Valider</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content" id="page-2">
+                    <div class="mdl-card mdl-shadow--2dp">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Changement de PIN</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <form>
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="password" pattern="[0-9]*" id="amount" maxlength="4">
+                                    <label class="mdl-textfield__label" for="amount">PIN actuel</label>
+                                    <span class="mdl-textfield__error">Veuillez entrer un PIN correct !</span>
+                                </div>
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="password" pattern="[0-9]*" id="amount" maxlength="4">
+                                    <label class="mdl-textfield__label" for="amount">Nouveau PIN</label>
+                                    <span class="mdl-textfield__error">Veuillez entrer un PIN correct !</span>
+                                </div>
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="password" pattern="[0-9]*" id="amount" maxlength="4">
+                                    <label class="mdl-textfield__label" for="amount">Nouveau PIN (confirmation)</label>
+                                    <span class="mdl-textfield__error">Veuillez entrer un PIN correct !</span>
+                                </div>
+                                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Valider</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content" id="page-3">
+                    <div class="mdl-card mdl-shadow--2dp">
+                        <div class="mdl-card__title">
+                            <h2 class="mdl-card__title-text">Réaliser un virement</h2>
+                        </div>
+                        <div class="mdl-card__supporting-text">
+                            <form>
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="password" pattern="[0-9]*" id="amount" maxlength="4">
+                                    <label class="mdl-textfield__label" for="amount">PIN actuel</label>
+                                    <span class="mdl-textfield__error">Veuillez entrer un PIN correct !</span>
+                                </div>
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="number" pattern="[0-9]*(\.[0-9]+)?" id="amount" max="100" min="5" step="0.10">
+                                    <label class="mdl-textfield__label" for="amount">Prix</label>
+                                    <span class="mdl-textfield__error">Veuillez entrer un prix correct !</span>
+                                </div>
+                                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Envoyer !</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <script src="bower_components/material-design-lite/material.min.js"></script>
+        <script src="scripts/dashboard.js"></script>
+    </body>
+</html>

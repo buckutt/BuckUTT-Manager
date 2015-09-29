@@ -1,0 +1,13 @@
+{
+  "name": "buckutt-manager",
+  "version": "1.0.0",
+  "authors": [
+    "Gabriel Juchault <gabriel.juchault@gmail.com>"
+  ],
+  "description": "BuckUTT account manager",
+  "license": "MIT",
+  "dependencies": {
+    "material-design-lite": "~1.0.5",
+    "roboto-fontface": "~0.4.3"
+  }
+}

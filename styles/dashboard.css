@@ -1,0 +1,62 @@
+/* Sidebar */
+.mdl-layout__drawer {
+    background-color: #34495e;
+    border-right-color: rgba(0, 0, 0, 0.1);
+}
+
+.mdl-layout-title {
+    color: #fff;
+}
+
+.mdl-layout__drawer .mdl-navigation .mdl-navigation__link {
+    cursor: pointer;
+    color: #eee;
+}
+
+.mdl-layout__drawer .mdl-navigation .mdl-navigation__link:hover,
+.navigation-active {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
+.mdl-navigation__link i {
+    margin-right: 5px;
+    vertical-align: bottom;
+}
+
+/* Pages */
+.page-content {
+    display: none;
+}
+
+.page-content.page-visible {
+    display: block;
+}
+
+.mdl-card {
+    margin: 30px auto;
+    max-width: 800px;
+    width: 90%;
+}
+
+#page-0 .mdl-card {
+    max-width: 1000px;
+}
+
+.mdl-card__supporting-text {
+    font-size: 16px;
+    margin: 0 auto;
+}
+
+table {
+    width: 100%;
+}
+
+.mdl-textfield {
+    width: 100%;
+}
+
+.mdl-button--raised.mdl-button--colored {
+    color: #fff;
+    margin-top: 15px;
+    width: 100%;
+}

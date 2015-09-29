@@ -1,0 +1,29 @@
+.mdl-card {
+    margin: 50px auto;
+}
+
+.mdl-card__title {
+    padding-bottom: 0;
+}
+
+.mdl-card__supporting-text {
+    padding: 0 15px;
+}
+
+form {
+    padding: 0 15px;
+}
+
+a {
+    width: calc(100% - 15px);
+}
+
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type=number] {
+    -moz-appearance:textfield;
+}

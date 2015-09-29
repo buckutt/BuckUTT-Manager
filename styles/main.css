@@ -1,0 +1,24 @@
+html, body {
+    font-family: 'Roboto';
+}
+
+header.mdl-layout__header {
+    background-color: #34495e;
+}
+
+.mdl-card {
+    min-height: 0;
+}
+
+.mdl-button.mdl-button--colored {
+    color: #2980b9;
+}
+
+.mdl-textfield__label:after {
+    background-color: #2980b9;
+}
+
+.mdl-textfield--floating-label.is-focused .mdl-textfield__label,
+.mdl-textfield--floating-label.is-dirty .mdl-textfield__label {
+    color: #2980b9;
+}
