@@ -1,0 +1,11 @@
+{
+	"port": 80,
+	"backend": {
+		"host": "",
+		"port": 8081
+	},
+	"etu": {
+		"api_client_id": "",
+		"api_client_secret": ""
+	}
+}
