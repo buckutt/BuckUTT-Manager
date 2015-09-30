@@ -8,7 +8,7 @@ $login.addEventListener('submit', function (e){
 		data: { authorization_code: getQueryStringValue("authorization_code"), pin: $login.elements['pin'].value }
 	})
 	.then(function (resp) {
-		alert(resp);
+		console.log(resp);
 	})
 	.fail(function (err, msg) {
     	console.log(err);
