@@ -1,6 +1,5 @@
 .mdl-card {
     margin: 50px auto;
-    padding: 0;
 }
 
 .mdl-card__title {
@@ -15,8 +14,8 @@ form {
     padding: 0 15px;
 }
 
-button {
-    width: 100%;
+a {
+    width: calc(100% - 15px);
 }
 
 input[type=number]::-webkit-outer-spin-button,

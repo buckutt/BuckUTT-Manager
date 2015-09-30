@@ -2,12 +2,14 @@
   "name": "buckutt-manager",
   "version": "1.0.0",
   "authors": [
-    "Gabriel Juchault <gabriel.juchault@gmail.com>"
+    "Gabriel Juchault <gabriel.juchault@gmail.com>",
+    "Lucas Soulier <lucas.soulier@utt.fr>"
   ],
   "description": "BuckUTT account manager",
   "license": "MIT",
   "dependencies": {
     "material-design-lite": "~1.0.5",
-    "roboto-fontface": "~0.4.3"
+    "roboto-fontface": "~0.4.3",
+    "reqwest": "~2.0.4"
   }
 }

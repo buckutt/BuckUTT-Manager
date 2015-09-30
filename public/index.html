@@ -16,23 +16,27 @@
                 </div>
             </header>
             <main>
-                <form class="mdl-card mdl-shadow--4dp">
+                <div class="mdl-card mdl-shadow--4dp">
                     <div class="mdl-card__title">
                         <h2 class="mdl-card__title-text">Connexion</h2>
                     </div>
                     <div class="mdl-card__supporting-text">
-                        <div class="mdl-textfield mdl-js-textfield">
-                            <input class="mdl-textfield__input" type="password" maxlength="4" id="pin" />
-                            <label class="mdl-textfield__label" for="pin">Code PIN</label>
-                        </div>
+                        <form action="#" id="login">
+                            <div class="mdl-textfield mdl-js-textfield">
+                                <input class="mdl-textfield__input" type="password" maxlength="4" id="pin" />
+                                <label class="mdl-textfield__label" for="pin">Code PIN</label>
+                            </div>
+                        </form>
                     </div>
                     <div class="mdl-card__actions mdl-card--border">
-                        <button type="submit" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Connexion</button>
+                        <a class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">Connexion</a>
                     </div>
-                </form>
+                </div>
             </main>
         </div>
+        <script src="scripts/etu.js"></script>
+        <script src="scripts/login.js"></script>
         <script src="bower_components/material-design-lite/material.min.js"></script>
-        <script src="scripts/hidePIN.js"></script>
+        <script src="bower_components/reqwest/reqwest.min.js"></script>
     </body>
 </html>
