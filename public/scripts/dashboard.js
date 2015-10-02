@@ -54,10 +54,11 @@ function changePin(e) {
 
     reqwest({
         url: 'api/pin',
-        method: 'post',
+        method: 'put',
         headers: {
             'Authorization': 'Bearer '+sessionStorage.getItem('token')
-        }
+        },
+        data: { oldPin: $pin.elements['oldPin'].value, newPin: $pin.elements['newPin'].value, checkPin: $pin.elements['checkPin'].value }
     })
     .then(function (resp) {
 
@@ -99,6 +100,7 @@ setTimeout(function () {
 
 
 var $history = document.getElementById('history');
+var $pin = document.getElementById('pin')
 var $prevHistory = document.getElementById('prevHistory');
 var $nextHistory = document.getElementById('nextHistory');
 
@@ -131,6 +133,8 @@ var historyData = {
 };
 
 $history.addEventListener('click', loadHistory, false);
+
+$pin.addEventListener('submit', changePin, false);
 
 $prevHistory.addEventListener('click', function (e){
     e.preventDefault();

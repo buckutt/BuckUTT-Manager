@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var bodyParser = require('body-parser');
 var unirest = require('unirest');
+var bcrypt = require('bcryptjs');
 var config = require('./config');
 
 var app = express();
@@ -18,7 +19,7 @@ app.post('/api/login', function (req, res) {
 	.send({ grant_type: "authorization_code", authorization_code: req.body.authorization_code })
 	.auth(config.etu.api_client_id, config.etu.api_client_secret, true)
 	.end(function (response) {
-		var data =JSON.parse(response.body);
+		var data = JSON.parse(response.body);
 		if(data.response.access_token) {
 			var access_token = data.response.access_token
 
@@ -79,8 +80,40 @@ app.get('/api/history', function (req, res) {
 	}
 });
 
-app.post('/api/pin', function (req, res) {
-
+app.put('/api/pin', function (req, res) {
+	if(req.headers.authorization) {
+		if(req.body.newPin == req.body.checkPin) {
+			if(typeof parseInt(req.body.newPin) == "number" && req.body.newPin.length == 4) {
+				unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/users')
+				.header('Authorization', req.headers.authorization)
+				.type('json')
+				.query({ id: users[req.headers.authorization.replace('Bearer ','')] })
+				.end(function (user) {
+					bcrypt.compare(req.body.oldPin, user.body.data.pin, function(err, statecrypt) {
+					    if(statecrypt) {
+							bcrypt.genSalt(10, function(err, salt) {
+							    bcrypt.hash(req.body.newPin, salt, function(err, hash) {
+									unirest.put('http://'+config.backend.host+':'+config.backend.port+'/api/users/' + users[req.headers.authorization.replace('Bearer ','')])
+									.header('Authorization', req.headers.authorization)
+									.type('json')
+									.send({ pin: hash })
+									.end(function (user) {
+										res.send({ success: 1 });
+									});
+							    });
+							});
+					    } else {
+					    	res.status(500).send({error: "wrongPin"});
+					    }
+					});
+				});
+			} else {
+				res.status(500).send({error: "formatPin"});
+			}
+		} else {
+			res.status(500).send({error: "checkFailed"});
+		}
+	}
 });
 
 var server = app.listen(config.port, function () {
