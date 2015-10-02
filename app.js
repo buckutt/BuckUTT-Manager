@@ -6,6 +6,8 @@ var config = require('./config');
 
 var app = express();
 
+var users = {};
+
 app.use(express.static(path.join(__dirname, './public')));
 app.use(bodyParser.urlencoded({ 
   extended: true
@@ -32,9 +34,9 @@ app.post('/api/login', function (req, res) {
 				.send({MeanOfLoginId: 1, data: login, pin: req.body.pin})
 				.end(function (response) {
 					var data = response.body;
-
 					if(data.token) {
-						res.send({success: 1, token: data.token});
+						users[data.token] = data.user.id;
+						res.send({success: 1, token: data.token });
 					} else {
 						res.status(500).send({error: "pin"});
 					}
@@ -46,6 +48,27 @@ app.post('/api/login', function (req, res) {
 			res.status(500).send({error: "user"});
 		}			
 	});
+});
+
+app.get('/api/history', function (req, res) {
+	if(req.headers.authorization) {
+		unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/purchases')
+		.header('Authorization', req.headers.authorization)
+		.type('json')
+		.query({ BuyerId: users[req.headers.authorization.replace('Bearer ','')], embed: 'Point,Article,Seller', order: 'date', asc: 'DESC' })
+		.end(function (purchases) {
+			unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/reloads')
+			.header('Authorization', req.headers.authorization)
+			.type('json')
+			.query({ BuyerId: users[req.headers.authorization.replace('Bearer ','')], embed: 'Point,Operator,ReloadType', order: 'date', asc: 'DESC' })
+			.end(function (reloads) {
+				var history = purchases.body.data.concat(reloads.body.data).sort(function(a,b) { return new Date(b.date)-new Date(a.date); });
+				res.send({ success: 1, history: history });
+			});
+		});
+	} else {
+		res.status(500).send({error: "bearer"});
+	}
 });
 
 var server = app.listen(config.port, function () {
