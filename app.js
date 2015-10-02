@@ -8,6 +8,7 @@ var config = require('./config');
 var app = express();
 
 var users = {};
+var auths = {};
 
 app.use(express.static(path.join(__dirname, './public')));
 app.use(bodyParser.urlencoded({ 
@@ -15,40 +16,69 @@ app.use(bodyParser.urlencoded({
 })); 
 
 app.post('/api/login', function (req, res) {
-	unirest.post('https://etu.utt.fr/api/oauth/token')
-	.send({ grant_type: "authorization_code", authorization_code: req.body.authorization_code })
-	.auth(config.etu.api_client_id, config.etu.api_client_secret, true)
-	.end(function (response) {
-		var data = JSON.parse(response.body);
-		if(data.response.access_token) {
-			var access_token = data.response.access_token
+	if(!auths[req.body.authorization_code]) {
+		unirest.post('https://etu.utt.fr/api/oauth/token')
+		.send({ grant_type: "authorization_code", authorization_code: req.body.authorization_code })
+		.auth(config.etu.api_client_id, config.etu.api_client_secret, true)
+		.end(function (response) {
+			var data = JSON.parse(response.body);
+			if(data.response.access_token) {
+				var access_token = data.response.access_token;
+				auths[req.body.authorization_code] = access_token;
 
-			unirest.get('https://etu.utt.fr/api/public/user/account')
-			.query({ access_token: access_token})
-			.end(function (response) {
-				var data = JSON.parse(response.body);
-				var login = data.response.data.login;
-
-				unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/login')
-				.headers({'Accept': 'application/json'})
-				.type('json')
-				.send({MeanOfLoginId: 1, data: login, pin: req.body.pin})
+				unirest.get('https://etu.utt.fr/api/public/user/account')
+				.query({ access_token: access_token})
 				.end(function (response) {
-					var data = response.body;
-					if(data.token) {
-						users[data.token] = data.user.id;
-						res.send({success: 1, token: data.token });
-					} else {
-						res.status(500).send({error: "pin"});
-					}
+					var data = JSON.parse(response.body);
+					var login = data.response.data.login;
+
+					unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/login')
+					.headers({'Accept': 'application/json'})
+					.type('json')
+					.send({MeanOfLoginId: 1, data: login, pin: req.body.pin})
+					.end(function (response) {
+						var data = response.body;
+						if(data.token) {
+							users[data.token] = data.user.id;
+							delete auths[req.body.authorization_code];
+							res.send({success: 1, token: data.token });
+						} else {
+							res.status(500).send({error: "pin"});
+						}
+
+					});
 
 				});
+			} else {
+				res.status(500).send({error: "user"});
+			}			
+		});
+	} else {
+		var access_token = auths[req.body.authorization_code];
+
+		unirest.get('https://etu.utt.fr/api/public/user/account')
+		.query({ access_token: access_token})
+		.end(function (response) {
+			var data = JSON.parse(response.body);
+			var login = data.response.data.login;
+
+			unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/login')
+			.headers({'Accept': 'application/json'})
+			.type('json')
+			.send({MeanOfLoginId: 1, data: login, pin: req.body.pin})
+			.end(function (response) {
+				var data = response.body;
+				if(data.token) {
+					users[data.token] = data.user.id;
+					delete auths[req.body.authorization_code];
+					res.send({success: 1, token: data.token });
+				} else {
+					res.status(500).send({error: "pin"});
+				}
 
 			});
-		} else {
-			res.status(500).send({error: "user"});
-		}			
-	});
+		});
+	}
 });
 
 app.get('/api/history', function (req, res) {

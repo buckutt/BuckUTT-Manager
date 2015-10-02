@@ -13,7 +13,7 @@ $login.addEventListener('submit', function (e){
 		
 	})
 	.fail(function (err, msg) {
-    	console.log(err);
+    	showModal('Erreur', 'La connexion a échoué');
 	});
 
 }, false);
