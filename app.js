@@ -57,18 +57,30 @@ app.get('/api/history', function (req, res) {
 		.type('json')
 		.query({ BuyerId: users[req.headers.authorization.replace('Bearer ','')], embed: 'Point,Article,Seller', order: 'date', asc: 'DESC' })
 		.end(function (purchases) {
-			unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/reloads')
-			.header('Authorization', req.headers.authorization)
-			.type('json')
-			.query({ BuyerId: users[req.headers.authorization.replace('Bearer ','')], embed: 'Point,Operator,ReloadType', order: 'date', asc: 'DESC' })
-			.end(function (reloads) {
-				var history = purchases.body.data.concat(reloads.body.data).sort(function(a,b) { return new Date(b.date)-new Date(a.date); });
-				res.send({ success: 1, history: history });
-			});
+			if(purchases.body.data) {
+				unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/reloads')
+				.header('Authorization', req.headers.authorization)
+				.type('json')
+				.query({ BuyerId: users[req.headers.authorization.replace('Bearer ','')], embed: 'Point,Operator,ReloadType', order: 'date', asc: 'DESC' })
+				.end(function (reloads) {
+					if(reloads.body.data) {
+						var history = purchases.body.data.concat(reloads.body.data).sort(function(a,b) { return new Date(b.date)-new Date(a.date); });
+						res.send({ success: 1, history: history });
+					} else {
+						res.status(500).send({error: "disconnected"});
+					}
+				});
+			} else {
+				res.status(500).send({error: "disconnected"});
+			}
 		});
 	} else {
 		res.status(500).send({error: "bearer"});
 	}
+});
+
+app.post('/api/pin', function (req, res) {
+
 });
 
 var server = app.listen(config.port, function () {

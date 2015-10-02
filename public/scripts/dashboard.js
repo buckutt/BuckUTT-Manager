@@ -42,6 +42,27 @@ function loadHistory(e) {
         renderHistory(historyData);
     })
     .fail(function (err, msg) {
+        if(JSON.parse(err.response).error == 'disconnected') document.location.href = './';
+    });
+
+}
+
+function changePin(e) {
+    if (e) {
+        e.preventDefault();
+    }
+
+    reqwest({
+        url: 'api/pin',
+        method: 'post',
+        headers: {
+            'Authorization': 'Bearer '+sessionStorage.getItem('token')
+        }
+    })
+    .then(function (resp) {
+
+    })
+    .fail(function (err, msg) {
         console.log(err);
     });
 
