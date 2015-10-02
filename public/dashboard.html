@@ -9,6 +9,18 @@
         <link rel="stylesheet" href="styles/dashboard.css">
     </head>
     <body>
+        <div class="overlay"></div>
+        <div class="mdl-card mdl-shadow--4dp statusModal">
+            <div class="mdl-card__title">
+                <h2 class="mdl-card__title-text"></h2>
+            </div> 
+            <div class="mdl-card__supporting-text">
+                <div class="mdl-textfield mdl-js-textfield">
+                    <p></p>
+                </div>
+            </div>
+        </div>
+
         <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer">
             <div class="mdl-layout__drawer">
                 <span class="mdl-layout-title">BuckUTT</span>
@@ -142,6 +154,7 @@
         <script src="bower_components/material-design-lite/material.min.js"></script>
         <script src="bower_components/reqwest/reqwest.min.js"></script>
         <script src="bower_components/mustache.js/mustache.min.js"></script>
+        <script src="scripts/modal.js"></script>
         <script src="scripts/dashboard.js"></script>
 
         <script id="history-template" type="text/template">

@@ -98,7 +98,7 @@ app.put('/api/pin', function (req, res) {
 									.type('json')
 									.send({ pin: hash })
 									.end(function (user) {
-										res.send({ success: 1 });
+										res.send({ success: "changePin" });
 									});
 							    });
 							});

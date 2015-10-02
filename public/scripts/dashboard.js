@@ -36,7 +36,6 @@ function loadHistory(e) {
         batchHistory = resp.history;
         index = 0;
         perPage = 10;
-        console.log('length', batchHistory.length);
 
         historyData.history = batchHistory.slice(index, perPage);
         renderHistory(historyData);
@@ -61,10 +60,31 @@ function changePin(e) {
         data: { oldPin: $pin.elements['oldPin'].value, newPin: $pin.elements['newPin'].value, checkPin: $pin.elements['checkPin'].value }
     })
     .then(function (resp) {
+        if(resp.success == 'changePin') {
+            showModal('Changement de PIN', 'Le code PIN a bien été modifié !');
 
+            var $inputs = [].slice.call(document.getElementsByTagName('input'));
+            $inputs.forEach(function ($input) {
+                $input.value = '';
+            });
+        }
     })
     .fail(function (err, msg) {
-        console.log(err);
+        var error = JSON.parse(err.response);
+        switch(error.error) {
+            case 'wrongPin':
+                showModal('Erreur', 'Le PIN actuel n\'est pas le bon');
+                break;
+            case 'formatPin':
+                showModal('Erreur', 'Le format du nouveau PIN n\'est pas bon (4 caractères, uniquement des chiffres)');
+                break;
+            case 'checkFailed':
+                showModal('Erreur', 'Les deux PIN ne correspondent pas');
+                break;
+            default:
+                showModal('Erreur', 'Une erreur a eu lieu');
+                break;
+        }
     });
 
 }
