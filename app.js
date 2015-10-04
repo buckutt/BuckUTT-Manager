@@ -92,23 +92,25 @@ app.post('/api/transfer', function (req, res) {
 				.type('json')
 				.query({ id: users[req.headers.authorization.replace('Bearer ','')] })
 				.end(function (user) {
-					bcrypt.compare(req.body.pin, user.body.data.pin, function(err, statecrypt) {
-					    if(statecrypt) {
-							unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/transfer')
-							.header('Authorization', req.headers.authorization)
-							.type('json')
-							.send({ amount: req.body.amount*100, userId: req.body.userId})
-							.end(function (resTransfer) {
-								if (resTransfer.body.data) {
-									res.send({status: 1, transfer: resTransfer.body.data});
-								} else {
-									res.status(500).send({error: resTransfer.body.error});
-								}
-							});
-					    } else {
-					    	res.status(500).send({error: "wrongPin"});
-					    }
-					});
+					if(user.body.data) {
+						bcrypt.compare(req.body.pin, user.body.data.pin, function(err, statecrypt) {
+						    if(statecrypt) {
+								unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/transfer')
+								.header('Authorization', req.headers.authorization)
+								.type('json')
+								.send({ amount: req.body.amount*100, userId: req.body.userId})
+								.end(function (resTransfer) {
+									if (resTransfer.body.data) {
+										res.send({status: 1, transfer: resTransfer.body.data});
+									} else {
+										res.status(500).send({error: resTransfer.body.error});
+									}
+								});
+						    } else {
+						    	res.status(500).send({error: "wrongPin"});
+						    }
+						});
+					}
 				});
 			} else {
 				res.status(500).send({error: "amount"});
@@ -233,23 +235,25 @@ app.put('/api/pin', function (req, res) {
 				.type('json')
 				.query({ id: users[req.headers.authorization.replace('Bearer ','')] })
 				.end(function (user) {
-					bcrypt.compare(req.body.oldPin, user.body.data.pin, function(err, statecrypt) {
-					    if(statecrypt) {
-							bcrypt.genSalt(10, function(err, salt) {
-							    bcrypt.hash(req.body.newPin, salt, function(err, hash) {
-									unirest.put('http://'+config.backend.host+':'+config.backend.port+'/api/users/' + users[req.headers.authorization.replace('Bearer ','')])
-									.header('Authorization', req.headers.authorization)
-									.type('json')
-									.send({ pin: hash })
-									.end(function (user) {
-										res.send({ success: "changePin" });
-									});
-							    });
-							});
-					    } else {
-					    	res.status(500).send({error: "wrongPin"});
-					    }
-					});
+					if(user.body.data) {
+						bcrypt.compare(req.body.oldPin, user.body.data.pin, function(err, statecrypt) {
+						    if(statecrypt) {
+								bcrypt.genSalt(10, function(err, salt) {
+								    bcrypt.hash(req.body.newPin, salt, function(err, hash) {
+										unirest.put('http://'+config.backend.host+':'+config.backend.port+'/api/users/' + users[req.headers.authorization.replace('Bearer ','')])
+										.header('Authorization', req.headers.authorization)
+										.type('json')
+										.send({ pin: hash })
+										.end(function (user) {
+											res.send({ success: "changePin" });
+										});
+								    });
+								});
+						    } else {
+						    	res.status(500).send({error: "wrongPin"});
+						    }
+						});
+					}
 				});
 			} else {
 				res.status(500).send({error: "formatPin"});
