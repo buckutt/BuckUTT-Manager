@@ -230,23 +230,34 @@ var perPage = 10;
 var historyData = {
     type: function() {
         if(this.credit) return 'Rechargement';
+        else if(this.amount) return 'Virement';
         return 'Achat';
     },
     priceEuro: function() {
         if(this.credit) return this.credit/100;
+        else if(this.amount) return this.amount/100;
         return this.price/100;
     },
     performer: function() {
         if(this.credit) return 'Opérateur ' + this.Operator.firstname + ' ' + this.Operator.lastname;
+        else if(this.amount) {
+            if(this.amount > 0) return 'Avec ' + this.To.firstname + ' ' + this.To.lastname;
+            else return 'Avec ' + this.From.firstname + ' ' + this.From.lastname;
+        }
         return  'Vendeur ' + this.Seller.firstname + ' ' + this.Seller.lastname;
     },
     object: function() {
         if(this.credit) return this.ReloadType.name;
+        else if (this.amount) return '';
         return this.Article.name;
     },
     formatDate: function() {
         var date = new Date(this.date);
         return ('0' + date.getDate()).slice(-2) + '/' + ('0' + (date.getMonth()+1)).slice(-2) + '/' + date.getFullYear();
+    },
+    point: function() {
+        if(this.Point.name) return Point.name;
+        else return 'Internet';
     }
 };
 
