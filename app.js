@@ -170,7 +170,7 @@ app.get('/api/history', function (req, res) {
 						unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/transfers')
 						.header('Authorization', req.headers.authorization)
 						.type('json')
-						.query({ FromId: users[req.headers.authorization.replace('Bearer ','')], embed: 'From, To', order: 'date', asc: 'DESC' })
+						.query({ FromId: users[req.headers.authorization.replace('Bearer ','')], embed: 'From,To', order: 'date', asc: 'DESC' })
 						.end(function (transfersFrom) {
 							if(transfersFrom.body.data) {
 								transfersFrom.body.data = transfersFrom.body.data.map(function (transferItem) {
@@ -180,7 +180,7 @@ app.get('/api/history', function (req, res) {
 								unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/transfers')
 								.header('Authorization', req.headers.authorization)
 								.type('json')
-								.query({ ToId: users[req.headers.authorization.replace('Bearer ','')], embed: 'From, To', order: 'date', asc: 'DESC' })
+								.query({ ToId: users[req.headers.authorization.replace('Bearer ','')], embed: 'From,To', order: 'date', asc: 'DESC' })
 								.end(function (transfersTo) {
 									if(transfersTo.body.data) {
 										var history = purchases.body.data.concat(reloads.body.data.concat(transfersFrom.body.data.concat(transfersTo.body.data))).sort(function(a,b) { return new Date(b.date)-new Date(a.date); });
