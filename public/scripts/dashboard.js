@@ -32,7 +32,7 @@ function loadCredit () {
         document.getElementById('credit').innerHTML = (resp.credit / 100).toFixed(2) + '€';
     })
     .fail(function (err, msg) {
-        if(JSON.parse(err.response).error == 'disconnected') document.location.href = './';
+        document.location.href = './';
     });
 }
 
@@ -57,7 +57,7 @@ function loadHistory(e) {
         renderHistory(historyData);
     })
     .fail(function (err, msg) {
-        if(JSON.parse(err.response).error == 'disconnected') document.location.href = './';
+        document.location.href = './';
     });
 
 }
