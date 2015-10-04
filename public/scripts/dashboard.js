@@ -256,7 +256,7 @@ var historyData = {
         return ('0' + date.getDate()).slice(-2) + '/' + ('0' + (date.getMonth()+1)).slice(-2) + '/' + date.getFullYear();
     },
     point: function() {
-        if(!this.amount) return Point.name;
+        if(this.Point) return this.Point.name;
         else return 'Internet';
     }
 };
