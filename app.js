@@ -160,19 +160,22 @@ app.get('/api/history', function (req, res) {
 		.type('json')
 		.query({ BuyerId: users[req.headers.authorization.replace('Bearer ','')], embed: 'Point,Article,Seller', order: 'date', asc: 'DESC' })
 		.end(function (purchases) {
-			if(purchases.body.data) {
+			if(purchases.body) {
+				purchases.body.data = purchases.body.data || [];
 				unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/reloads')
 				.header('Authorization', req.headers.authorization)
 				.type('json')
 				.query({ BuyerId: users[req.headers.authorization.replace('Bearer ','')], embed: 'Point,Operator,ReloadType', order: 'date', asc: 'DESC' })
 				.end(function (reloads) {
-					if(reloads.body.data) {
+					if(reloads.body) {
+						reloads.body.data = reloads.body.data || [];
 						unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/transfers')
 						.header('Authorization', req.headers.authorization)
 						.type('json')
 						.query({ FromId: users[req.headers.authorization.replace('Bearer ','')], embed: 'From,To', order: 'date', asc: 'DESC' })
 						.end(function (transfersFrom) {
-							if(transfersFrom.body.data) {
+							if(transfersFrom.body) {
+								transfersFrom.body.data = transfersFrom.body.data || [];
 								transfersFrom.body.data = transfersFrom.body.data.map(function (transferItem) {
 									transferItem.amount = -1 * transferItem.amount;
 									return transferItem;
@@ -182,7 +185,8 @@ app.get('/api/history', function (req, res) {
 								.type('json')
 								.query({ ToId: users[req.headers.authorization.replace('Bearer ','')], embed: 'From,To', order: 'date', asc: 'DESC' })
 								.end(function (transfersTo) {
-									if(transfersTo.body.data) {
+									if(transfersTo.body) {
+										transfersTo.body.data = transfersTo.body.data || [];
 										var history = purchases.body.data.concat(reloads.body.data.concat(transfersFrom.body.data.concat(transfersTo.body.data))).sort(function(a,b) { return new Date(b.date)-new Date(a.date); });
 										res.send({ success: 1, history: history });
 									} else {
