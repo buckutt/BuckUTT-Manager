@@ -236,7 +236,7 @@ var historyData = {
     priceEuro: function() {
         if(this.credit) return this.credit/100;
         else if(this.amount) return this.amount/100;
-        return this.price/100;
+        return -this.price/100;
     },
     performer: function() {
         if(this.credit) return 'Opérateur ' + this.Operator.firstname + ' ' + this.Operator.lastname;
