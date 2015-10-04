@@ -20,6 +20,19 @@ function renderHistory(history) {
     }
 }
 
+function loadCredit () {
+    reqwest({
+        url: 'api/credit',
+        method: 'get',
+        headers: {
+            'Authorization': 'Bearer '+sessionStorage.getItem('token')
+        }
+    })
+    .then(function (resp) {
+        document.getElementById('credit').innerHTML = (resp.credit / 100).toFixed(2) + '€';
+    });
+}
+
 function loadHistory(e) {
     if (e) {
         e.preventDefault();
@@ -293,3 +306,4 @@ $transferAmount.removeAttribute('disabled');
 $transferTo.removeAttribute('disabled');
 
 loadHistory();
+loadCredit();
