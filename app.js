@@ -167,8 +167,32 @@ app.get('/api/history', function (req, res) {
 				.query({ BuyerId: users[req.headers.authorization.replace('Bearer ','')], embed: 'Point,Operator,ReloadType', order: 'date', asc: 'DESC' })
 				.end(function (reloads) {
 					if(reloads.body.data) {
-						var history = purchases.body.data.concat(reloads.body.data).sort(function(a,b) { return new Date(b.date)-new Date(a.date); });
-						res.send({ success: 1, history: history });
+						unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/transfers')
+						.header('Authorization', req.headers.authorization)
+						.type('json')
+						.query({ FromId: users[req.headers.authorization.replace('Bearer ','')], embed: 'From, To', order: 'date', asc: 'DESC' })
+						.end(function (transfersFrom) {
+							if(transfersFrom.body.data) {
+								transfersFrom.body.data = transfersFrom.body.data.map(function (transferItem) {
+									transferItem.amount = -1 * transferItem.amount;
+									return transferItem;
+								});
+								unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/transfers')
+								.header('Authorization', req.headers.authorization)
+								.type('json')
+								.query({ ToId: users[req.headers.authorization.replace('Bearer ','')], embed: 'From, To', order: 'date', asc: 'DESC' })
+								.end(function (transfersTo) {
+									if(transfersTo.body.data) {
+										var history = purchases.body.data.concat(reloads.body.data.concat(transfersFrom.body.data.concat(transfersTo.body.data))).sort(function(a,b) { return new Date(b.date)-new Date(a.date); });
+										res.send({ success: 1, history: history });
+									} else {
+										res.status(500).send({error: "disconnected"});
+									}
+								});
+							} else {
+								res.status(500).send({error: "disconnected"});
+							}
+						});
 					} else {
 						res.status(500).send({error: "disconnected"});
 					}
