@@ -108,7 +108,15 @@ function transfer(e) {
             }
         })
         .then(function (resp) {
-
+            showModal('Virement', 'Virement effectué');
+            $transferCancel.style.display = 'none';
+            $transferTo.removeAttribute('disabled');
+            $transferPIN.removeAttribute('disabled');
+            $transferAmount.removeAttribute('disabled');
+            $transferTo.value = '';
+            $transferPIN.value = '';
+            $transferAmount.value = '';
+            $transferCancel.nextElementSibling.childNodes[0].nodeValue = 'Suivant ›';
         })
         .fail(function (err, msg) {
             var error = JSON.parse(err.response);
@@ -125,14 +133,6 @@ function transfer(e) {
     }
 
 
-    $transferCancel.style.display = 'inline-block';
-    $transferTo.setAttribute('disabled', '');
-    $transferPIN.setAttribute('disabled', '');
-    $transferAmount.setAttribute('disabled', '');
-    // next button (suivant) children.
-    // First one is text node (suivant >), second one is ripple effect
-    $transferCancel.nextElementSibling.childNodes[0].nodeValue = 'Envoyer à ' + 'Lucas Lonk';
-    return;
     reqwest({
         url: 'api/getEtuName?cardId=' + $transferTo.value,
         method: 'get',
@@ -276,4 +276,4 @@ $nextHistory.addEventListener('click', function (e){
     renderHistory(historyData);
 });
 
-//loadHistory();
+loadHistory();
