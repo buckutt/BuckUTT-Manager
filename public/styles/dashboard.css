@@ -60,3 +60,26 @@ table {
     margin-top: 15px;
     width: 100%;
 }
+
+.mdl-button--raised.mdl-button--colored {
+    color: #fff;
+    margin-top: 15px;
+    width: 100%;
+}
+
+#cancelTransfer {
+    background-color: #e74c3c;
+    border-bottom-right-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: none;
+    display: none;
+    font-size: 30px;
+    height: 36px;
+    margin-top: 15px;
+    position: absolute;
+    z-index: 2;
+}
+
+#cancelTransfer:hover {
+    background-color: #c0392b;
+}

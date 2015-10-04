@@ -83,18 +83,32 @@ app.post('/api/login', function (req, res) {
 
 app.post('/api/transfer', function (req, res) {
 	if (req.headers.authorizaton) {
-		if (req.body.userId && typeof req.body.amount === "number") {
-			if (req.body.amount && typeof req.body.amount === "number") {
-				unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/transfer')
+		if (req.body.userId) {
+			req.body.userId = parseInt(req.body.userId, 10);
+			if (req.body.amount) {
+				req.body.amount = parseInt(req.body.amount, 10);
+				unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/users')
 				.header('Authorization', req.headers.authorization)
 				.type('json')
-				.send({ amount: req.body.amount, userId: req.body.userId})
-				.end(function (resTransfer) {
-					if (resTransfer.body.data) {
-						res.send({status: 1, transfer: transfer});
-					} else {
-						res.status(500).send({error: resTransfer.body.error});
-					}
+				.query({ id: users[req.headers.authorization.replace('Bearer ','')] })
+				.end(function (user) {
+					bcrypt.compare(req.body.pin, user.body.data.pin, function(err, statecrypt) {
+					    if(statecrypt) {
+							unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/transfer')
+							.header('Authorization', req.headers.authorization)
+							.type('json')
+							.send({ amount: req.body.amount, userId: req.body.userId})
+							.end(function (resTransfer) {
+								if (resTransfer.body.data) {
+									res.send({status: 1, transfer: transfer});
+								} else {
+									res.status(500).send({error: resTransfer.body.error});
+								}
+							});
+					    } else {
+					    	res.status(500).send({error: "wrongPin"});
+					    }
+					});
 				});
 			} else {
 				res.status(500).send({error: "amount"});
@@ -102,6 +116,38 @@ app.post('/api/transfer', function (req, res) {
 		} else {
 			res.status(500).send({error: "user"});
 		}
+	} else {
+		res.status(500).send({error: "bearer"});
+	}
+});
+
+app.get('/api/getEtuName', function (req,res) {
+	if(req.headers.authorization) {
+		if (!req.query.cardId) {
+			return res.status(500).send({error: "card"});
+		}
+
+		unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/meanofloginsusers')
+		.header('Authorization', req.headers.authorization)
+		.type('json')
+		.query({ data: req.query.cardId, MeanOfLoginId: '2' })
+		.end(function (meanoflogin) {
+			if (meanoflogin.body.data) {
+				unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/users')
+				.header('Authorization', req.headers.authorization)
+				.type('json')
+				.query({ id: meanoflogin.body.data.UserId })
+				.end(function (user) {
+					if (user.body.data) {
+						res.json({ username: user.body.data.firstname + ' ' + user.body.data.lastname });
+					} else {
+						res.status(500).send({error: "user"});
+					}
+				});
+			} else {
+				res.status(500).send({error: "user"});
+			}
+		});
 	} else {
 		res.status(500).send({error: "bearer"});
 	}

@@ -37,10 +37,10 @@
                         <i class="material-icons">lock_outline</i>
                         PIN
                     </a>
-                    <!--<a class="mdl-navigation__link" data-target="page-3">
+                    <a class="mdl-navigation__link" data-target="page-3">
                         <i class="material-icons">swap_horiz</i>
-                        Virements
-                    </a>-->
+                        Virement
+                    </a>
                 </nav>
             </div>
             <main class="mdl-layout__content">
@@ -89,8 +89,8 @@
                         <div class="mdl-card__supporting-text">
                             <form>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                    <input class="mdl-textfield__input" type="number" pattern="[0-9]*(\.[0-9]+)?" id="amount" max="100" min="5" step="0.10">
-                                    <label class="mdl-textfield__label" for="amount">Prix</label>
+                                    <input class="mdl-textfield__input" type="number" pattern="[0-9]*(\.[0-9]+)?" id="reloadAmount" max="100" min="5" step="0.10">
+                                    <label class="mdl-textfield__label" for="reloadAmount">Prix</label>
                                     <span class="mdl-textfield__error">Veuillez entrer un prix correct !</span>
                                 </div>
                                 <p>Vous serez redirigé vers un site bancaire sécurisé.</p>
@@ -108,17 +108,17 @@
                             <form id="pin">
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                     <input class="mdl-textfield__input" type="password" pattern="[0-9]*" id="oldPin" maxlength="4">
-                                    <label class="mdl-textfield__label" for="amount">PIN actuel</label>
+                                    <label class="mdl-textfield__label" for="oldPin">PIN actuel</label>
                                     <span class="mdl-textfield__error">Veuillez entrer un PIN correct !</span>
                                 </div>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                     <input class="mdl-textfield__input" type="password" pattern="[0-9]*" id="newPin" maxlength="4">
-                                    <label class="mdl-textfield__label" for="amount">Nouveau PIN</label>
+                                    <label class="mdl-textfield__label" for="newPin">Nouveau PIN</label>
                                     <span class="mdl-textfield__error">Veuillez entrer un PIN correct !</span>
                                 </div>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
                                     <input class="mdl-textfield__input" type="password" pattern="[0-9]*" id="checkPin" maxlength="4">
-                                    <label class="mdl-textfield__label" for="amount">Nouveau PIN (confirmation)</label>
+                                    <label class="mdl-textfield__label" for="checkPin">Nouveau PIN (confirmation)</label>
                                     <span class="mdl-textfield__error">Veuillez entrer un PIN correct !</span>
                                 </div>
                                 <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Valider</button>
@@ -132,18 +132,24 @@
                             <h2 class="mdl-card__title-text">Réaliser un virement</h2>
                         </div>
                         <div class="mdl-card__supporting-text">
-                            <form>
+                            <form id="transfer">
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                    <input class="mdl-textfield__input" type="password" pattern="[0-9]*" id="amount" maxlength="4">
-                                    <label class="mdl-textfield__label" for="amount">PIN actuel</label>
+                                    <input class="mdl-textfield__input" type="password" pattern="[0-9]*" id="transferPIN" maxlength="4">
+                                    <label class="mdl-textfield__label" for="transferPIN">PIN actuel</label>
                                     <span class="mdl-textfield__error">Veuillez entrer un PIN correct !</span>
                                 </div>
                                 <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-                                    <input class="mdl-textfield__input" type="number" pattern="[0-9]*(\.[0-9]+)?" id="amount" max="100" min="5" step="0.10">
-                                    <label class="mdl-textfield__label" for="amount">Prix</label>
+                                    <input class="mdl-textfield__input" type="number" pattern="[0-9]*" id="transferTo">
+                                    <label class="mdl-textfield__label" for="transferTo">Numéro étudiant</label>
+                                    <span class="mdl-textfield__error">Veuillez entrer un numéro étudiant correct !</span>
+                                </div>
+                                <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                    <input class="mdl-textfield__input" type="number" pattern="[0-9]*(\.[0-9]+)?" id="transferAmount" max="100" min="5" step="0.10">
+                                    <label class="mdl-textfield__label" for="transferAmount">Prix</label>
                                     <span class="mdl-textfield__error">Veuillez entrer un prix correct !</span>
                                 </div>
-                                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Envoyer !</button>
+                                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect" id="cancelTransfer">&times;</button>
+                                <button type="submit" class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Suivant &rsaquo;</button>
                             </form>
                         </div>
                     </div>

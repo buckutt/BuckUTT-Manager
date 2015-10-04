@@ -89,6 +89,97 @@ function changePin(e) {
 
 }
 
+function transfer(e) {
+    e.preventDefault();
+
+    var isFirstStep = $transferCancel.nextElementSibling.childNodes[0].nodeValue.indexOf('Suivant') === 0;
+
+    if (!isFirstStep) {
+        reqwest({
+            url: 'api/transfer',
+            method: 'post',
+            headers: {
+                'Authorization': 'Bearer '+sessionStorage.getItem('token')
+            },
+            data: {
+                userId: $transferTo.value,
+                amount: $transferAmount.value,
+                pin: $transferPIN.value
+            }
+        })
+        .then(function (resp) {
+
+        })
+        .fail(function (err, msg) {
+            var error = JSON.parse(err.response);
+            switch(error.error) {
+                case 'bearer':
+                    showModal('Erreur', 'Utilisateur introuvable');
+                    break;
+                default:
+                    showModal('Erreur', 'Une erreur a eu lieu');
+                    break;
+            }
+        });
+        return;
+    }
+
+
+    $transferCancel.style.display = 'inline-block';
+    $transferTo.setAttribute('disabled', '');
+    $transferPIN.setAttribute('disabled', '');
+    $transferAmount.setAttribute('disabled', '');
+    // next button (suivant) children.
+    // First one is text node (suivant >), second one is ripple effect
+    $transferCancel.nextElementSibling.childNodes[0].nodeValue = 'Envoyer à ' + 'Lucas Lonk';
+    return;
+    reqwest({
+        url: 'api/getEtuName?cardId=' + $transferTo.value,
+        method: 'get',
+        headers: {
+            'Authorization': 'Bearer '+sessionStorage.getItem('token')
+        }
+    })
+    .then(function (resp) {
+        $transferCancel.style.display = 'inline-block';
+        $transferTo.setAttribute('disabled', '');
+        $transferPIN.setAttribute('disabled', '');
+        $transferAmount.setAttribute('disabled', '');
+        // next button (suivant) children.
+        // First one is text node (suivant >), second one is ripple effect
+        $transferCancel.nextElementSibling.childNodes[0].nodeValue = 'Envoyer à ' + resp;
+    })
+    .fail(function (err, msg) {
+        var error = JSON.parse(err.response);
+        switch(error.error) {
+            case 'wrongPin':
+                showModal('Erreur', 'Le PIN actuel n\'est pas le bon');
+                break;
+            case 'card':
+                showModal('Erreur', 'Spécifiez un utilisateur');
+                break;
+            case 'user':
+                showModal('Erreur', 'Utilisateur introuvable');
+                break;
+            default:
+                showModal('Erreur', 'Une erreur a eu lieu');
+                break;
+        }
+    });
+}
+
+function cancelTransfer(e) {
+    e.preventDefault();
+
+    $transferCancel.style.display = 'none';
+    $transferTo.removeAttribute('disabled');
+    $transferPIN.removeAttribute('disabled');
+    $transferAmount.removeAttribute('disabled');
+    $transferTo.value = '';
+    $transferTo.focus();
+    $transferCancel.nextElementSibling.childNodes[0].nodeValue = 'Suivant ›';
+}
+
 var $links = [].slice.call(document.getElementsByClassName('mdl-navigation__link'));
 
 $links.forEach(function ($link) {
@@ -113,6 +204,7 @@ $links.forEach(function ($link) {
     }, false);
 });
 
+// Set required after Material loads to prevent automatic error input
 var $input = document.querySelector('#page-1 .mdl-textfield__input');
 setTimeout(function () {
     $input.setAttribute('required', '');
@@ -120,7 +212,12 @@ setTimeout(function () {
 
 
 var $history = document.getElementById('history');
-var $pin = document.getElementById('pin')
+var $pin = document.getElementById('pin');
+var $transferPIN = document.getElementById('transferPIN');
+var $transferTo = document.getElementById('transferTo');
+var $transferAmount = document.getElementById('transferAmount');
+var $transfer = document.getElementById('transfer');
+var $transferCancel = document.getElementById('cancelTransfer');
 var $prevHistory = document.getElementById('prevHistory');
 var $nextHistory = document.getElementById('nextHistory');
 
@@ -156,6 +253,9 @@ $history.addEventListener('click', loadHistory, false);
 
 $pin.addEventListener('submit', changePin, false);
 
+$transfer.addEventListener('submit', transfer, false);
+$transferCancel.addEventListener('click', cancelTransfer, false);
+
 $prevHistory.addEventListener('click', function (e){
     e.preventDefault();
 
@@ -176,4 +276,4 @@ $nextHistory.addEventListener('click', function (e){
     renderHistory(historyData);
 });
 
-loadHistory();
+//loadHistory();

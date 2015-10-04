@@ -14,6 +14,16 @@ header.mdl-layout__header {
     color: #2980b9;
 }
 
+.mdl-button--raised.mdl-button--colored {
+    background-color: #2980b9;
+}
+
+.mdl-button--raised.mdl-button--colored:hover,
+.mdl-button--raised.mdl-button--colored:active,
+.mdl-button--raised.mdl-button--colored:focus:not(:active) {
+    background-color: #20638f;
+}
+
 .mdl-textfield__label:after {
     background-color: #2980b9;
 }
