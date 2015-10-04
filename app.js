@@ -82,7 +82,7 @@ app.post('/api/login', function (req, res) {
 });
 
 app.post('/api/transfer', function (req, res) {
-	if (req.headers.authorizaton) {
+	if (req.headers.authorization) {
 		if (req.body.userId) {
 			req.body.userId = parseInt(req.body.userId, 10);
 			if (req.body.amount) {
@@ -94,13 +94,13 @@ app.post('/api/transfer', function (req, res) {
 				.end(function (user) {
 					bcrypt.compare(req.body.pin, user.body.data.pin, function(err, statecrypt) {
 					    if(statecrypt) {
-							unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/transfer')
+							unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/transfer')
 							.header('Authorization', req.headers.authorization)
 							.type('json')
-							.send({ amount: req.body.amount, userId: req.body.userId})
+							.send({ amount: req.body.amount*100, userId: req.body.userId})
 							.end(function (resTransfer) {
 								if (resTransfer.body.data) {
-									res.send({status: 1, transfer: transfer});
+									res.send({status: 1, transfer: resTransfer.body.data});
 								} else {
 									res.status(500).send({error: resTransfer.body.error});
 								}
@@ -139,7 +139,7 @@ app.get('/api/getEtuName', function (req,res) {
 				.query({ id: meanoflogin.body.data.UserId })
 				.end(function (user) {
 					if (user.body.data) {
-						res.json({ username: user.body.data.firstname + ' ' + user.body.data.lastname });
+						res.json({ username: user.body.data.firstname + ' ' + user.body.data.lastname, id: user.body.data.id });
 					} else {
 						res.status(500).send({error: "user"});
 					}

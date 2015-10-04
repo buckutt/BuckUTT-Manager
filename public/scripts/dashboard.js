@@ -102,7 +102,7 @@ function transfer(e) {
                 'Authorization': 'Bearer '+sessionStorage.getItem('token')
             },
             data: {
-                userId: $transferTo.value,
+                userId: realUserId,
                 amount: $transferAmount.value,
                 pin: $transferPIN.value
             }
@@ -141,13 +141,14 @@ function transfer(e) {
         }
     })
     .then(function (resp) {
+        realUserId = resp.id;
         $transferCancel.style.display = 'inline-block';
         $transferTo.setAttribute('disabled', '');
         $transferPIN.setAttribute('disabled', '');
         $transferAmount.setAttribute('disabled', '');
         // next button (suivant) children.
         // First one is text node (suivant >), second one is ripple effect
-        $transferCancel.nextElementSibling.childNodes[0].nodeValue = 'Envoyer à ' + resp;
+        $transferCancel.nextElementSibling.childNodes[0].nodeValue = 'Envoyer à ' + resp.username;
     })
     .fail(function (err, msg) {
         var error = JSON.parse(err.response);
@@ -220,7 +221,7 @@ var $transfer = document.getElementById('transfer');
 var $transferCancel = document.getElementById('cancelTransfer');
 var $prevHistory = document.getElementById('prevHistory');
 var $nextHistory = document.getElementById('nextHistory');
-
+var realUserId;
 
 var batchHistory = [];
 var index = 0;
@@ -275,5 +276,9 @@ $nextHistory.addEventListener('click', function (e){
     historyData.history = batchHistory.slice(index, index + perPage);
     renderHistory(historyData);
 });
+
+$transferPIN.removeAttribute('disabled');
+$transferAmount.removeAttribute('disabled');
+$transferTo.removeAttribute('disabled');
 
 loadHistory();

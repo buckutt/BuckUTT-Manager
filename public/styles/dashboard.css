@@ -71,11 +71,12 @@ table {
     background-color: #e74c3c;
     border-bottom-right-radius: 0;
     border-top-right-radius: 0;
+    bottom: 32px;
     box-shadow: none;
     display: none;
     font-size: 30px;
     height: 36px;
-    margin-top: 15px;
+    left: 40px;
     position: absolute;
     z-index: 2;
 }
