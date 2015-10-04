@@ -210,6 +210,20 @@ app.get('/api/history', function (req, res) {
 	}
 });
 
+app.get('/api/credit', function (req, res) {
+	if(req.headers.authorization) {
+		unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/users')
+		.header('Authorization', req.headers.authorization)
+		.type('json')
+		.query({ id: users[req.headers.authorization.replace('Bearer ','')] })
+		.end(function (user) {
+			res.json({ credit: user.body.data.credit });
+		});
+	} else {
+		res.status(500).send({error: "bearer"});
+	}
+});
+
 app.put('/api/pin', function (req, res) {
 	if(req.headers.authorization) {
 		if(req.body.newPin == req.body.checkPin) {
