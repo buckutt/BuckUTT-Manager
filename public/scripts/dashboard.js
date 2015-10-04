@@ -241,8 +241,8 @@ var historyData = {
     performer: function() {
         if(this.credit) return 'Opérateur ' + this.Operator.firstname + ' ' + this.Operator.lastname;
         else if(this.amount) {
-            if(this.amount > 0) return 'Avec ' + this.To.firstname + ' ' + this.To.lastname;
-            else return 'Avec ' + this.From.firstname + ' ' + this.From.lastname;
+            if(this.amount > 0) return 'Avec ' + this.From.firstname + ' ' + this.From.lastname;
+            else return 'Avec ' + this.To.firstname + ' ' + this.To.lastname;
         }
         return  'Vendeur ' + this.Seller.firstname + ' ' + this.Seller.lastname;
     },
