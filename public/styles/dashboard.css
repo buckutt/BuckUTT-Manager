@@ -84,3 +84,9 @@ table {
 #cancelTransfer:hover {
     background-color: #c0392b;
 }
+
+.mdl-layout__drawer p {
+    color: #fff;
+    font-size: 18px;
+    padding: 0 20px;
+}
