@@ -81,6 +81,32 @@ app.post('/api/login', function (req, res) {
 	}
 });
 
+app.post('/api/transfer', function (req, res) {
+	if (req.headers.authorizaton) {
+		if (req.body.userId && typeof req.body.amount === "number") {
+			if (req.body.amount && typeof req.body.amount === "number") {
+				unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/transfer')
+				.header('Authorization', req.headers.authorization)
+				.type('json')
+				.send({ amount: req.body.amount, userId: req.body.userId})
+				.end(function (resTransfer) {
+					if (resTransfer.body.data) {
+						res.send({status: 1, transfer: transfer});
+					} else {
+						res.status(500).send({error: resTransfer.body.error});
+					}
+				});
+			} else {
+				res.status(500).send({error: "amount"});
+			}
+		} else {
+			res.status(500).send({error: "user"});
+		}
+	} else {
+		res.status(500).send({error: "bearer"});
+	}
+});
+
 app.get('/api/history', function (req, res) {
 	if(req.headers.authorization) {
 		unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/purchases')
