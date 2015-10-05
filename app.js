@@ -222,7 +222,11 @@ app.get('/api/credit', function (req, res) {
 		.type('json')
 		.query({ id: users[req.headers.authorization.replace('Bearer ','')] })
 		.end(function (user) {
-			res.json({ credit: user.body.data.credit });
+			if(user.body.data) {
+				res.json({ credit: user.body.data.credit });
+			} else {
+				res.status(500).send({error: "disconnected"});
+			}
 		});
 	} else {
 		res.status(500).send({error: "bearer"});
