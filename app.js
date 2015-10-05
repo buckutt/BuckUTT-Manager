@@ -31,7 +31,6 @@ app.post('/api/login', function (req, res) {
 				.end(function (response) {
 					var data = JSON.parse(response.body);
 					var login = data.response.data.login;
-
 					unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/login')
 					.headers({'Accept': 'application/json'})
 					.type('json')
@@ -85,35 +84,39 @@ app.post('/api/transfer', function (req, res) {
 	if (req.headers.authorization) {
 		if (req.body.userId) {
 			req.body.userId = parseInt(req.body.userId, 10);
-			if (req.body.amount) {
-				req.body.amount = parseInt(req.body.amount, 10);
-				unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/users')
-				.header('Authorization', req.headers.authorization)
-				.type('json')
-				.query({ id: users[req.headers.authorization.replace('Bearer ','')] })
-				.end(function (user) {
-					if(user.body.data) {
-						bcrypt.compare(req.body.pin, user.body.data.pin, function(err, statecrypt) {
-						    if(statecrypt) {
-								unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/transfer')
-								.header('Authorization', req.headers.authorization)
-								.type('json')
-								.send({ amount: req.body.amount*100, userId: req.body.userId})
-								.end(function (resTransfer) {
-									if (resTransfer.body.data) {
-										res.send({status: 1, transfer: resTransfer.body.data});
-									} else {
-										res.status(500).send({error: resTransfer.body.error});
-									}
-								});
-						    } else {
-						    	res.status(500).send({error: "wrongPin"});
-						    }
-						});
-					}
-				});
+			if(req.body.userId != users[req.headers.authorization.replace('Bearer ','')]) {
+				if (req.body.amount) {
+					req.body.amount = parseInt(req.body.amount, 10);
+					unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/users')
+					.header('Authorization', req.headers.authorization)
+					.type('json')
+					.query({ id: users[req.headers.authorization.replace('Bearer ','')] })
+					.end(function (user) {
+						if(user.body.data) {
+							bcrypt.compare(req.body.pin, user.body.data.pin, function(err, statecrypt) {
+							    if(statecrypt) {
+									unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/transfer')
+									.header('Authorization', req.headers.authorization)
+									.type('json')
+									.send({ amount: req.body.amount*100, userId: req.body.userId})
+									.end(function (resTransfer) {
+										if (resTransfer.body.data) {
+											res.send({status: 1, transfer: resTransfer.body.data});
+										} else {
+											res.status(500).send({error: resTransfer.body.error});
+										}
+									});
+							    } else {
+							    	res.status(500).send({error: "wrongPin"});
+							    }
+							});
+						}
+					});
+				} else {
+					res.status(500).send({error: "amount"});
+				}
 			} else {
-				res.status(500).send({error: "amount"});
+				res.status(500).send({error: "sameUser"});
 			}
 		} else {
 			res.status(500).send({error: "user"});
@@ -264,7 +267,7 @@ app.put('/api/pin', function (req, res) {
 	}
 });
 
-var server = app.listen(config.port, function () {
+var server = app.listen(config.port, 'localhost', function () {
   var host = server.address().address;
   var port = server.address().port;
 
