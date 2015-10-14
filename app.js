@@ -87,31 +87,35 @@ app.post('/api/transfer', function (req, res) {
 			if(req.body.userId != users[req.headers.authorization.replace('Bearer ','')]) {
 				if (req.body.amount) {
 					req.body.amount = parseInt(req.body.amount, 10);
-					unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/users')
-					.header('Authorization', req.headers.authorization)
-					.type('json')
-					.query({ id: users[req.headers.authorization.replace('Bearer ','')] })
-					.end(function (user) {
-						if(user.body.data) {
-							bcrypt.compare(req.body.pin, user.body.data.pin, function(err, statecrypt) {
-							    if(statecrypt) {
-									unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/transfer')
-									.header('Authorization', req.headers.authorization)
-									.type('json')
-									.send({ amount: req.body.amount*100, userId: req.body.userId})
-									.end(function (resTransfer) {
-										if (resTransfer.body.data) {
-											res.send({status: 1, transfer: resTransfer.body.data});
-										} else {
-											res.status(500).send({error: resTransfer.body.error});
-										}
-									});
-							    } else {
-							    	res.status(500).send({error: "wrongPin"});
-							    }
-							});
-						}
-					});
+					if(req.body.amount > 0) {
+						unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/users')
+						.header('Authorization', req.headers.authorization)
+						.type('json')
+						.query({ id: users[req.headers.authorization.replace('Bearer ','')] })
+						.end(function (user) {
+							if(user.body.data) {
+								bcrypt.compare(req.body.pin, user.body.data.pin, function(err, statecrypt) {
+								    if(statecrypt) {
+										unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/transfer')
+										.header('Authorization', req.headers.authorization)
+										.type('json')
+										.send({ amount: req.body.amount, userId: req.body.userId})
+										.end(function (resTransfer) {
+											if (resTransfer.body.data) {
+												res.send({status: 1, transfer: resTransfer.body.data});
+											} else {
+												res.status(500).send({error: resTransfer.body.error});
+											}
+										});
+								    } else {
+								    	res.status(500).send({error: "wrongPin"});
+								    }
+								});
+							}
+						});
+					} else {
+						res.status(500).send({error: "amount"});
+					}
 				} else {
 					res.status(500).send({error: "amount"});
 				}
@@ -163,24 +167,27 @@ app.get('/api/history', function (req, res) {
 		unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/purchases')
 		.header('Authorization', req.headers.authorization)
 		.type('json')
-		.query({ BuyerId: users[req.headers.authorization.replace('Bearer ','')], embed: 'Point,Article,Seller', order: 'date', asc: 'DESC' })
+		.query({ BuyerId: users[req.headers.authorization.replace('Bearer ','')], isRemoved: 0, embed: 'Point,Article,Seller', order: 'date', asc: 'DESC' })
 		.end(function (purchases) {
 			if(purchases.body) {
 				purchases.body.data = purchases.body.data || [];
+				if(purchases.body.data.id) purchases.body.data = [purchases.body.data];
 				unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/reloads')
 				.header('Authorization', req.headers.authorization)
 				.type('json')
-				.query({ BuyerId: users[req.headers.authorization.replace('Bearer ','')], embed: 'Point,Operator,ReloadType', order: 'date', asc: 'DESC' })
+				.query({ BuyerId: users[req.headers.authorization.replace('Bearer ','')], isRemoved: 0, embed: 'Point,Operator,ReloadType', order: 'date', asc: 'DESC' })
 				.end(function (reloads) {
 					if(reloads.body) {
 						reloads.body.data = reloads.body.data || [];
+						if(reloads.body.data.id) reloads.body.data = [reloads.body.data];
 						unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/transfers')
 						.header('Authorization', req.headers.authorization)
 						.type('json')
-						.query({ FromId: users[req.headers.authorization.replace('Bearer ','')], embed: 'From,To', order: 'date', asc: 'DESC' })
+						.query({ FromId: users[req.headers.authorization.replace('Bearer ','')], isRemoved: 0, embed: 'From,To', order: 'date', asc: 'DESC' })
 						.end(function (transfersFrom) {
 							if(transfersFrom.body) {
 								transfersFrom.body.data = transfersFrom.body.data || [];
+								if(transfersFrom.body.data.id) transfersFrom.body.data = [transfersFrom.body.data];
 								transfersFrom.body.data = transfersFrom.body.data.map(function (transferItem) {
 									transferItem.amount = -1 * transferItem.amount;
 									return transferItem;
@@ -188,10 +195,11 @@ app.get('/api/history', function (req, res) {
 								unirest.get('http://'+config.backend.host+':'+config.backend.port+'/api/transfers')
 								.header('Authorization', req.headers.authorization)
 								.type('json')
-								.query({ ToId: users[req.headers.authorization.replace('Bearer ','')], embed: 'From,To', order: 'date', asc: 'DESC' })
+								.query({ ToId: users[req.headers.authorization.replace('Bearer ','')], isRemoved:0, embed: 'From,To', order: 'date', asc: 'DESC' })
 								.end(function (transfersTo) {
 									if(transfersTo.body) {
 										transfersTo.body.data = transfersTo.body.data || [];
+										if(transfersTo.body.data.id) transfersTo.body.data = [transfersTo.body.data];
 										var history = purchases.body.data.concat(reloads.body.data.concat(transfersFrom.body.data.concat(transfersTo.body.data))).sort(function(a,b) { return new Date(b.date)-new Date(a.date); });
 										res.send({ success: 1, history: history });
 									} else {

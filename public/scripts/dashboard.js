@@ -119,12 +119,13 @@ function transfer(e) {
             },
             data: {
                 userId: realUserId,
-                amount: $transferAmount.value,
+                amount: Math.round(parseFloat($transferAmount.value)*100),
                 pin: $transferPIN.value
             }
         })
         .then(function (resp) {
             showModal('Virement', 'Virement effectué');
+            loadCredit();
             $transferCancel.style.display = 'none';
             $transferTo.removeAttribute('disabled');
             $transferPIN.removeAttribute('disabled');
@@ -246,17 +247,17 @@ var perPage = 10;
 var historyData = {
     type: function() {
         if(this.credit) return 'Rechargement';
-        else if(this.amount) return 'Virement';
+        else if(this.amount || this.amount === 0) return 'Virement';
         return 'Achat';
     },
     priceEuro: function() {
         if(this.credit) return this.credit/100;
-        else if(this.amount) return this.amount/100;
+        else if(this.amount || this.amount === 0) return this.amount/100;
         return -this.price/100;
     },
     performer: function() {
         if(this.credit) return 'Opérateur ' + this.Operator.firstname + ' ' + this.Operator.lastname;
-        else if(this.amount) {
+        else if(this.amount || this.amount === 0) {
             if(this.amount > 0) return 'Avec ' + this.From.firstname + ' ' + this.From.lastname;
             else return 'Avec ' + this.To.firstname + ' ' + this.To.lastname;
         }
@@ -264,7 +265,7 @@ var historyData = {
     },
     object: function() {
         if(this.credit) return this.ReloadType.name;
-        else if (this.amount) return '';
+        else if (this.amount || this.amount === 0) return '';
         return this.Article.name;
     },
     formatDate: function() {
