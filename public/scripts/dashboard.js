@@ -29,6 +29,10 @@ function loadCredit () {
         }
     })
     .then(function (resp) {
+        if(config.maintenance.activated && config.maintenance.authorizedIds.indexOf(resp.id) === -1) {
+            document.location.href = 'maintenance.html';
+            return;
+        }
         document.getElementById('credit').innerHTML = (resp.credit / 100).toFixed(2) + '€';
     })
     .fail(function (err, msg) {
@@ -57,7 +61,11 @@ function loadHistory(e) {
         renderHistory(historyData);
     })
     .fail(function (err, msg) {
-        document.location.href = './';
+        if(config.maintenance.activated) {
+            document.location.href = 'maintenance.html';
+        } else {
+            document.location.href = './';
+        }
     });
 
 }

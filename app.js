@@ -231,7 +231,7 @@ app.get('/api/credit', function (req, res) {
 		.query({ id: users[req.headers.authorization.replace('Bearer ','')] })
 		.end(function (user) {
 			if(user.body.data) {
-				res.json({ credit: user.body.data.credit });
+				res.json({ id: user.body.data.id, credit: user.body.data.credit });
 			} else {
 				res.status(500).send({error: "disconnected"});
 			}
