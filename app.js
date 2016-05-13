@@ -88,10 +88,11 @@ app.post('/api/login', function (req, res) {
 
 app.post('/api/sherlocks', function (req, res) {
 	var ranges = config.sherlocks.ranges;
-	var valid = true;
+	var valid = false;
+
 	ranges.forEach(function(v) {
-		if (req.headers['x-real-ip'].indexOf(':') !== -1 || !rangeCheck.inRange(req.headers['x-real-ip'], v)) {
-			valid = false;
+		if (req.headers['x-real-ip'].indexOf(':') === -1 && rangeCheck.inRange(req.headers['x-real-ip'], v)) {
+			valid = true;
 		}
 	});
 
@@ -131,6 +132,7 @@ app.post('/api/sherlocks', function (req, res) {
 		.type('json')
 		.send({credit: response[5], trace: response[32] + ' ' + response[6] + ' ' + response[7] + ' ' + response[15]})
 		.end(function (resp) {
+			console.log('Reload '+response[5] + ' ' + response[32] + ' ' + response[6] + ' ' + response[7] + ' ' + response[15]);
 			delete bearers[reloadedUserId];
 		});
 
@@ -139,7 +141,7 @@ app.post('/api/sherlocks', function (req, res) {
 });
 
 app.post('/api/reload', function (req, res) {
-	if (req.headers.authorization) {
+	if (req.headers.authorization && usersDetails[req.headers.authorization.replace('Bearer ','')]) {
 		if (parseInt(req.body.amount)+usersDetails[req.headers.authorization.replace('Bearer ','')].credit <= config.reloadLimit*100) {
 			if(parseInt(req.body.amount) >= config.reloadMin*100) {
 				var reloaderId = users[req.headers.authorization.replace('Bearer ','')];
