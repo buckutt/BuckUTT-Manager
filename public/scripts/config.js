@@ -1,6 +1,6 @@
 var config = {};
 
 config.maintenance = {
-    activated: true,
-    authorizedIds: []
+    activated: false,
+    authorizedIds: [9976,11133]
 };

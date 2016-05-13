@@ -3,12 +3,16 @@ var path = require('path');
 var bodyParser = require('body-parser');
 var unirest = require('unirest');
 var bcrypt = require('bcryptjs');
+var rangeCheck = require('range_check');
+var execFile = require('child_process').execFile;
 var config = require('./config');
 
 var app = express();
 
 var users = {};
+var usersDetails = {};
 var auths = {};
+var bearers = {};
 
 app.use(express.static(path.join(__dirname, './public')));
 app.use(bodyParser.urlencoded({ 
@@ -37,20 +41,22 @@ app.post('/api/login', function (req, res) {
 					.send({MeanOfLoginId: 1, data: login, pin: req.body.pin})
 					.end(function (response) {
 						var data = response.body;
-						if(data.token) {
-							users[data.token] = data.user.id;
-							delete auths[req.body.authorization_code];
-							res.send({success: 1, token: data.token });
-						} else {
-							res.status(500).send({error: "pin"});
+						if(data) {
+							if(data.token) {
+								users[data.token] = data.user.id;
+								usersDetails[data.token] = data.user;
+								delete auths[req.body.authorization_code];
+								res.send({success: 1, token: data.token });
+							} else {
+								res.status(500).send({error: "pin"});
+							}
 						}
-
 					});
 
 				});
 			} else {
 				res.status(500).send({error: "user"});
-			}			
+			}
 		});
 	} else {
 		var access_token = auths[req.body.authorization_code];
@@ -80,6 +86,102 @@ app.post('/api/login', function (req, res) {
 	}
 });
 
+app.post('/api/sherlocks', function (req, res) {
+	var ranges = config.sherlocks.ranges;
+	var valid = true;
+	ranges.forEach(function(v) {
+		if (req.headers['x-real-ip'].indexOf(':') !== -1 || !rangeCheck.inRange(req.headers['x-real-ip'], v)) {
+			valid = false;
+		}
+	});
+
+	if(!valid) {
+		return res.status(403).end();
+	}
+
+	var command = config.sherlocks.response;
+
+	var params = [
+		'pathfile=' + config.sherlocks.pathfile,
+		'message=' + req.body.DATA
+	];
+
+	execFile(command, params, function(error, stdout, stderr) {
+		if (error && error.code === 'ENOENT') {
+			console.log('Unable to execute the sherlocks binary.');
+			return res.status(500).send({error: error});
+		}
+		// Handle sherlocks errors. The return value is given between the
+		// two firsts "!". -1 indicates an unrecoverable error.
+		if (stdout.indexOf('!-1!') === 0) {
+			console.log('Sherlock\'s error: ' + error + ' - stdout: ' + stdout + ' - stderr: ' + stderr);
+			return res.status(500).send({error: error});
+		}
+
+		var response = stdout.split('!');
+
+		if(response[11] !== '00' || response[18] !== '00') {
+			console.log('Bank error ' + response[11] + ' ' + response[18]);
+			return res.status(500).send({error: 'Bank error'});
+		}
+
+		var reloadedUserId = response[32].split('_')[0];
+		unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/reloadOnline')
+		.header('Authorization', bearers[reloadedUserId])
+		.type('json')
+		.send({credit: response[5], trace: response[32] + ' ' + response[6] + ' ' + response[7] + ' ' + response[15]})
+		.end(function (resp) {
+			delete bearers[reloadedUserId];
+		});
+
+		return res.send({answer: stdout});
+	});
+});
+
+app.post('/api/reload', function (req, res) {
+	if (req.headers.authorization) {
+		if (parseInt(req.body.amount)+usersDetails[req.headers.authorization.replace('Bearer ','')].credit <= config.reloadLimit*100) {
+			if(parseInt(req.body.amount) >= config.reloadMin*100) {
+				var reloaderId = users[req.headers.authorization.replace('Bearer ','')];
+
+				var transactionId = reloaderId +'_'+ (new Date()).getTime();
+
+				var command = config.sherlocks.request;
+
+				bearers[reloaderId] = req.headers.authorization;
+
+				var params = [
+					'pathfile=' + config.sherlocks.pathfile,
+					'merchant_id=' + config.sherlocks.merchant_id,
+					'amount=' + req.body.amount,
+					'data=' + transactionId
+				];
+
+				execFile(command, params, function(error, stdout, stderr) {
+					if (error && error.code === 'ENOENT') {
+						console.log('Unable to execute the sherlocks binary.');
+						return res.status(500).send({error: error});
+					}
+					// Handle sherlocks errors. The return value is given between the
+					// two firsts "!". -1 indicates an unrecoverable error.
+					if (stdout.indexOf('!-1!') === 0) {
+						console.log('Sherlock\'s error: ' + error + ' - stdout: ' + stdout + ' - stderr: ' + stderr);
+						return res.status(500).send({error: error});
+					}
+
+					return res.send({initiate: stdout.split('!')[3]});
+				});
+			} else {
+				res.status(500).send({error: "min"});
+			}
+		} else {
+			res.status(500).send({error: "limit"});
+		}
+	} else {
+		res.status(500).send({error: "bearer"});
+	}
+});
+
 app.post('/api/transfer', function (req, res) {
 	if (req.headers.authorization) {
 		if (req.body.userId) {
@@ -95,7 +197,7 @@ app.post('/api/transfer', function (req, res) {
 						.end(function (user) {
 							if(user.body.data) {
 								bcrypt.compare(req.body.pin, user.body.data.pin, function(err, statecrypt) {
-								    if(statecrypt) {
+									if(statecrypt) {
 										unirest.post('http://'+config.backend.host+':'+config.backend.port+'/api/services/transfer')
 										.header('Authorization', req.headers.authorization)
 										.type('json')
@@ -107,9 +209,9 @@ app.post('/api/transfer', function (req, res) {
 												res.status(500).send({error: resTransfer.body.error});
 											}
 										});
-								    } else {
-								    	res.status(500).send({error: "wrongPin"});
-								    }
+									} else {
+										res.status(500).send({error: "wrongPin"});
+									}
 								});
 							}
 						});
@@ -252,9 +354,9 @@ app.put('/api/pin', function (req, res) {
 				.end(function (user) {
 					if(user.body.data) {
 						bcrypt.compare(req.body.oldPin, user.body.data.pin, function(err, statecrypt) {
-						    if(statecrypt) {
+							if(statecrypt) {
 								bcrypt.genSalt(10, function(err, salt) {
-								    bcrypt.hash(req.body.newPin, salt, function(err, hash) {
+									bcrypt.hash(req.body.newPin, salt, function(err, hash) {
 										unirest.put('http://'+config.backend.host+':'+config.backend.port+'/api/users/' + users[req.headers.authorization.replace('Bearer ','')])
 										.header('Authorization', req.headers.authorization)
 										.type('json')
@@ -262,11 +364,11 @@ app.put('/api/pin', function (req, res) {
 										.end(function (user) {
 											res.send({ success: "changePin" });
 										});
-								    });
+									});
 								});
-						    } else {
-						    	res.status(500).send({error: "wrongPin"});
-						    }
+							} else {
+								res.status(500).send({error: "wrongPin"});
+							}
 						});
 					}
 				});
@@ -278,6 +380,15 @@ app.put('/api/pin', function (req, res) {
 		}
 	}
 });
+
+app.post('/refused', function (req, res) {
+	res.header('Location', './dashboard.html#refused').status(301).send();
+});
+
+app.post('/accepted', function (req, res) {
+	res.header('Location', './dashboard.html#accepted').status(301).send();
+});
+
 
 var server = app.listen(config.port, 'localhost', function () {
   var host = server.address().address;

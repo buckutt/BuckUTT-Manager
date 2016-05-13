@@ -110,7 +110,45 @@ function changePin(e) {
                 break;
         }
     });
+}
 
+function reload(e) {
+    e.preventDefault();
+
+    reqwest({
+        url: 'api/reload',
+        method: 'post',
+        headers: {
+            'Authorization': 'Bearer '+sessionStorage.getItem('token')
+        },
+        data: {
+            amount: Math.round(parseFloat($reloadAmount.value)*100)
+        }
+    })
+    .then(function (resp) {
+        $reload.style.display = 'none';
+        $backSherlocks.style.display = 'inline';
+        $sherlocks.style.display = 'block';
+        $sherlocks.innerHTML = resp.initiate;
+    })
+    .fail(function (err, msg) {
+        var error = JSON.parse(err.response);
+        switch(error.error) {
+            case 'bearer':
+                showModal('Erreur', 'Utilisateur introuvable');
+                break;
+            case 'limit':
+                showModal('Erreur', 'Il n\'est pas autorisé d\'avoir plus de 100€ sur son compte');
+                break;
+            case 'min':
+                showModal('Erreur', 'Le minimum de rechargement est de 5 euros');
+                break;
+            default:
+                showModal('Erreur', 'Une erreur a eu lieu');
+                break;
+        }
+    });
+    return;
 }
 
 function transfer(e) {
@@ -238,6 +276,10 @@ setTimeout(function () {
 
 
 var $history = document.getElementById('history');
+var $reload = document.getElementById('reload');
+var $reloadAmount = document.getElementById('reloadAmount');
+var $sherlocks = document.getElementById('sherlocks');
+var $backSherlocks = document.getElementById('backSherlocks');
 var $pin = document.getElementById('pin');
 var $transferPIN = document.getElementById('transferPIN');
 var $transferTo = document.getElementById('transferTo');
@@ -290,6 +332,14 @@ $history.addEventListener('click', loadHistory, false);
 
 $pin.addEventListener('submit', changePin, false);
 
+$reload.addEventListener('submit', reload, false);
+
+$backSherlocks.addEventListener('click', function (){
+    $reload.style.display = 'block';
+    $sherlocks.style.display = 'none';
+    $backSherlocks.style.display = 'none';
+});
+
 $transfer.addEventListener('submit', transfer, false);
 $transferCancel.addEventListener('click', cancelTransfer, false);
 
@@ -316,6 +366,15 @@ $nextHistory.addEventListener('click', function (e){
 $transferPIN.removeAttribute('disabled');
 $transferAmount.removeAttribute('disabled');
 $transferTo.removeAttribute('disabled');
+$backSherlocks.style.display = 'none';
+
+if(window.location.hash == '#refused') {
+    showModal("Paiement", "Le paiement n'a pas abouti.");
+}
+
+if(window.location.hash == '#accepted') {
+    showModal("Paiement", "Le paiement a été reçu par la banque et sera traité dans les prochaines minutes.");
+}
 
 loadHistory();
 loadCredit();

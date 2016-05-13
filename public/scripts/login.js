@@ -14,7 +14,7 @@ $login.addEventListener('submit', function (e){
 		
 	})
 	.fail(function (err, msg) {
-    	showModal('Erreur', 'La connexion a échoué');
+		showModal('Erreur', 'La connexion a échoué');
 	});
 
 }, false);

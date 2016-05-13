@@ -7,5 +7,14 @@
 	"etu": {
 		"api_client_id": "",
 		"api_client_secret": ""
-	}
+	},
+    "sherlocks": {
+        "merchant_id": ""
+        "response": "/opt/sherlocks/bin/response",
+        "request":  "/opt/sherlocks/bin/request",
+        "pathfile": "/opt/sherlocks/config/pathfile",
+        "ranges": []
+    },
+    "reloadMin": 5,
+    "reloadLimit": 100
 }
