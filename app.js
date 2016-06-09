@@ -21,7 +21,7 @@ app.use(bodyParser.urlencoded({
 
 app.post('/api/login', function (req, res) {
 	if(!auths[req.body.authorization_code]) {
-		unirest.post('http://etuutt.uttnetgroup.fr/api/oauth/token')
+		unirest.post('http://etuutt.uttnetgroup.net/api/oauth/token')
 		.send({ grant_type: "authorization_code", authorization_code: req.body.authorization_code })
 		.auth(config.etu.api_client_id, config.etu.api_client_secret, true)
 		.end(function (response) {
@@ -30,7 +30,7 @@ app.post('/api/login', function (req, res) {
 				var access_token = data.response.access_token;
 				auths[req.body.authorization_code] = access_token;
 
-				unirest.get('http://etuutt.uttnetgroup.fr/api/public/user/account')
+				unirest.get('http://etuutt.uttnetgroup.net/api/public/user/account')
 				.query({ access_token: access_token})
 				.end(function (response) {
 					var data = JSON.parse(response.body);
@@ -61,7 +61,7 @@ app.post('/api/login', function (req, res) {
 	} else {
 		var access_token = auths[req.body.authorization_code];
 
-		unirest.get('http://etuutt.uttnetgroup.fr/api/public/user/account')
+		unirest.get('http://etuutt.uttnetgroup.net/api/public/user/account')
 		.query({ access_token: access_token})
 		.end(function (response) {
 			var data = JSON.parse(response.body);
