@@ -5,6 +5,7 @@
 		"port": 8081
 	},
 	"etu": {
+        "domain": "etuutt.uttnetgroup.net",
 		"api_client_id": "",
 		"api_client_secret": ""
 	},
