@@ -114,7 +114,8 @@ function changePin(e) {
 
 function reload(e) {
     e.preventDefault();
-
+    showModal('Erreur', 'La fonctionnalitée n\'est pas disponible.');
+    /*
     reqwest({
         url: 'api/reload',
         method: 'post',
@@ -148,6 +149,7 @@ function reload(e) {
                 break;
         }
     });
+*/
     return;
 }
 
